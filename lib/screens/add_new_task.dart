@@ -1,6 +1,7 @@
 import 'package:crm_task_feature/Constants.dart';
 import 'package:crm_task_feature/models/task.dart';
 import 'package:crm_task_feature/providers.dart/tasks.dart';
+import 'package:crm_task_feature/screens/not_implemented.dart';
 import 'package:crm_task_feature/widgets/Navigation_bar.dart';
 import 'package:crm_task_feature/widgets/Select_button.dart';
 import 'package:crm_task_feature/widgets/add_assigned.dart';
@@ -83,6 +84,10 @@ class _AddTaskState extends State<AddTask> {
         });
     }
 
+    void notImplemented(BuildContext context) {
+      print('not implemented');
+    }
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
@@ -157,7 +162,7 @@ class _AddTaskState extends State<AddTask> {
                                 color: ColorPalette.secondaryColor,
                               ),
                               text: 'Select tag',
-                              onButtonPressed: _selectDate,
+                              onButtonPressed: notImplemented,
                             ),
                           ]),
                     ),
