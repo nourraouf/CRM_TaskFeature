@@ -22,7 +22,9 @@ class TaskCard extends StatelessWidget {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Container(
-      color: ColorPalette.solidWhite,
+      decoration: BoxDecoration(
+          color: ColorPalette.solidWhite,
+          borderRadius: BorderRadius.circular(8)),
       width: width * 0.34,
       height: height * 0.18,
       child: SingleChildScrollView(

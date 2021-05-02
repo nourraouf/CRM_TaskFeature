@@ -37,7 +37,7 @@ class SelectButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
               primary: ColorPalette.solidWhite,
               elevation: 0,
-              shape: const BeveledRectangleBorder(
+              shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(5))),
               side: BorderSide(color: Color(0xffECECF2), width: 1)),
           onPressed: () {

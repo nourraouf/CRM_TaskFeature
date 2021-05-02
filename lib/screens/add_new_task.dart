@@ -1,18 +1,18 @@
 import 'package:crm_task_feature/Constants.dart';
 import 'package:crm_task_feature/models/task.dart';
 import 'package:crm_task_feature/providers.dart/tasks.dart';
-import 'package:crm_task_feature/screens/not_implemented.dart';
+
 import 'package:crm_task_feature/widgets/Navigation_bar.dart';
 import 'package:crm_task_feature/widgets/Select_button.dart';
 import 'package:crm_task_feature/widgets/add_assigned.dart';
 import 'package:crm_task_feature/widgets/add_attachments.dart';
 import 'package:crm_task_feature/widgets/add_description.dart';
 import 'package:crm_task_feature/widgets/custom_appbar.dart';
-import 'package:crm_task_feature/widgets/custom_checkbox.dart';
+
 import 'package:crm_task_feature/widgets/type_new_task.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -31,9 +31,7 @@ class _AddTaskState extends State<AddTask> {
   final _subTask = TextEditingController();
   String filename = null;
   bool _submit(BuildContext context) {
-    if (_addFormKey.currentState.validate() &&
-        selectedDate != null &&
-        attachments != null) {
+    if (_addFormKey.currentState.validate() && selectedDate != null) {
       _addFormKey.currentState.save();
       Provider.of<Tasks>(context, listen: false).addTask(Task(
           assignedTo: '',
@@ -48,8 +46,7 @@ class _AddTaskState extends State<AddTask> {
       selectedDate = null;
       return true;
     }
-    print(_description.text);
-    print(_subTask.text);
+
     return false;
   }
 
@@ -84,10 +81,6 @@ class _AddTaskState extends State<AddTask> {
         });
     }
 
-    void notImplemented(BuildContext context) {
-      print('not implemented');
-    }
-
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
@@ -109,6 +102,7 @@ class _AddTaskState extends State<AddTask> {
             child: Column(
           children: <Widget>[
             //type new task
+            //************************************************************* */
             Container(
               padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
               height: height * 0.1,
@@ -148,21 +142,10 @@ class _AddTaskState extends State<AddTask> {
                                 Icons.calendar_today,
                                 color: ColorPalette.secondaryColor,
                               ),
-                              text: 'Select date',
+                              text: selectedDate == null
+                                  ? 'Select date'
+                                  : f.format(selectedDate),
                               onButtonPressed: _selectDate,
-                            ),
-                            SizedBox(
-                              width: width * 0.01,
-                            ),
-                            SelectButton(
-                              width: width,
-                              height: height,
-                              icon: Icon(
-                                Icons.track_changes_sharp,
-                                color: ColorPalette.secondaryColor,
-                              ),
-                              text: 'Select tag',
-                              onButtonPressed: notImplemented,
                             ),
                           ]),
                     ),
@@ -173,55 +156,7 @@ class _AddTaskState extends State<AddTask> {
             AddDescription(
               discontroller: _description,
             ),
-            Container(
-              padding: EdgeInsets.only(left: 10, top: 10),
-              margin: EdgeInsets.fromLTRB(width * 0.034, 0, width * 0.034, 5),
-              height: height * 0.11,
-              width: width * 0.928,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  color: ColorPalette.solidWhite),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 5),
-                      child: const Text("Subtask", style: Styles.greyText2),
-                    ),
-                    Container(
-                      height: height * 0.06,
-                      child: Row(children: <Widget>[
-                        CustomCheckbox(isChecked: false),
-                        Container(
-                            width: width * 0.8,
-                            padding: const EdgeInsets.only(left: 5),
-                            child: TextFormField(
-                              controller: _subTask,
-                              validator: (value) {
-                                if (value.isEmpty)
-                                  return 'please enter a subtask';
-                                return null;
-                              },
-                              inputFormatters: [
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r"[a-zA-Z]+\s"))
-                              ],
-                              cursorColor: ColorPalette.primaryColor,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  hintText: "type to add more..."),
-                            ))
-                      ]),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
             Container(
               padding: EdgeInsets.only(left: 10, top: 10),
               margin: EdgeInsets.fromLTRB(width * 0.034, 0, width * 0.034, 5),

@@ -24,13 +24,21 @@ class AddDescription extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
+            Container(
+              //    width: double.infinity,
               padding: const EdgeInsets.all(5),
-              child: FittedBox(
-                child: const Text(
-                  'Description',
-                  style: Styles.greyText,
-                ),
+              child: Row(
+                //  scrollDirection: Axis.horizontal,
+                children: <Widget>[
+                  const Text(
+                    'Description',
+                    style: Styles.greyText,
+                  ),
+                  const Text(
+                    '*',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
               ),
             ),
             Padding(
