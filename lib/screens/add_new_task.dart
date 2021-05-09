@@ -1,18 +1,15 @@
 import 'package:crm_task_feature/Constants.dart';
 import 'package:crm_task_feature/models/task.dart';
 import 'package:crm_task_feature/providers.dart/tasks.dart';
-
 import 'package:crm_task_feature/widgets/Navigation_bar.dart';
 import 'package:crm_task_feature/widgets/Select_button.dart';
-import 'package:crm_task_feature/widgets/add_assigned.dart';
 import 'package:crm_task_feature/widgets/add_attachments.dart';
 import 'package:crm_task_feature/widgets/add_description.dart';
+import 'package:crm_task_feature/widgets/add_title.dart';
 import 'package:crm_task_feature/widgets/custom_appbar.dart';
-
-import 'package:crm_task_feature/widgets/type_new_task.dart';
+import 'package:crm_task_feature/widgets/success_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -23,27 +20,39 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
-  DateTime selectedDate = null;
+  String dropdownValue = 'Ahmed';
+  DateTime _selectedDate = null;
+  String taskTitle;
+  String taskDescription;
+  String taskDate;
+
   final _addFormKey = GlobalKey<FormState>();
   final f = new DateFormat('dd MMM yyyy');
-  PlatformFile attachments = null;
+  PlatformFile _attachments = null;
   final _description = TextEditingController();
-  final _subTask = TextEditingController();
-  String filename = null;
+  final _taskTitle = TextEditingController();
+  String _filename = null;
   bool _submit(BuildContext context) {
-    if (_addFormKey.currentState.validate() && selectedDate != null) {
+    if (_addFormKey.currentState.validate()) {
       _addFormKey.currentState.save();
       Provider.of<Tasks>(context, listen: false).addTask(Task(
-          assignedTo: '',
+          assignedTo: dropdownValue,
           description: _description.text,
-          endDate: selectedDate,
+          endDate: _selectedDate,
           startDate: DateTime.now(),
           tag: ''));
-      print(_description.text);
+      setState(() {
+        _attachments = null;
+        taskDate =
+            _selectedDate == null ? DateTime.now() : f.format(_selectedDate);
+        taskDescription = _description.text;
+        taskTitle = _taskTitle.text;
+        _selectedDate = null;
+      });
+
       _description.clear();
-      _subTask.clear();
-      attachments = null;
-      selectedDate = null;
+      _taskTitle.clear();
+
       return true;
     }
 
@@ -59,13 +68,52 @@ class _AddTaskState extends State<AddTask> {
       );
       if (result != null) {
         PlatformFile file = result.files.first;
-        attachments = file;
+        _attachments = file;
         setState(() {
-          filename = file.name;
+          _filename = file.name;
         });
       } else {
         // User canceled the picker
       }
+    }
+
+    void showAlertDialog(BuildContext context, String text, int status) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(text),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    if (status == 1) {
+                      Navigator.of(context).pushReplacementNamed('/');
+                    } else {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Text('ok'))
+            ],
+            content: Container(
+              width: MediaQuery.of(context).size.width / 1.3,
+              height: MediaQuery.of(context).size.height / 2.5,
+              decoration: new BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: const Color(0xFFFFFF),
+              ),
+              child: status == 1
+                  ? SuccessDialog(
+                      taskTitle: taskDescription,
+                      description: taskDescription,
+                      assignedTo: dropdownValue,
+                      filename: _filename,
+                      taskDate: taskDate,
+                    )
+                  : Text("Please enter a valid data"),
+            ),
+          );
+        },
+      );
     }
 
     Future<void> _selectDate(BuildContext context) async {
@@ -74,10 +122,10 @@ class _AddTaskState extends State<AddTask> {
           initialDate: DateTime.now(),
           firstDate: DateTime.now(),
           lastDate: DateTime(2022));
-      if (picked != null && picked != selectedDate)
+      if (picked != null && picked != _selectedDate)
         setState(() {
-          selectedDate = picked;
-          print(selectedDate.toIso8601String());
+          _selectedDate = picked;
+          print(_selectedDate.toIso8601String());
         });
     }
 
@@ -101,18 +149,60 @@ class _AddTaskState extends State<AddTask> {
         child: SingleChildScrollView(
             child: Column(
           children: <Widget>[
-            //type new task
-            //************************************************************* */
+            //title
+            addTitle(_taskTitle, height, width),
+            //assigned
+
             Container(
-              padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-              height: height * 0.1,
-              color: ColorPalette.solidWhite,
-              child: TypeNewTask(
-                f: f,
+              padding: EdgeInsets.only(left: 10, top: 10),
+              margin: EdgeInsets.fromLTRB(width * 0.034, 10, width * 0.034, 5),
+              height: height * 0.11,
+              width: width * 0.928,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: ColorPalette.solidWhite),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: const Text("Assigned to", style: Styles.greyText),
+                    ),
+                    Container(
+                      width: width * 0.3,
+                      height: width * 0.096,
+                      child: Center(
+                        child: DropdownButton<String>(
+                          value: dropdownValue,
+                          icon: const Icon(Icons.add),
+                          onChanged: (newValue) {
+                            setState(() {
+                              dropdownValue = newValue;
+                            });
+                          },
+                          items: <String>['Ahmed', 'Menna', 'Mariem']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        color: ColorPalette.solidWhite,
+                        border: Border.all(
+                          color: Color(0xFFECECF2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            //assigned
-            AddAssigned(width: width, height: height),
+
             //due to
             Container(
               padding: EdgeInsets.only(left: 10, top: 10),
@@ -142,9 +232,9 @@ class _AddTaskState extends State<AddTask> {
                                 Icons.calendar_today,
                                 color: ColorPalette.secondaryColor,
                               ),
-                              text: selectedDate == null
+                              text: _selectedDate == null
                                   ? 'Select date'
-                                  : f.format(selectedDate),
+                                  : f.format(_selectedDate),
                               onButtonPressed: _selectDate,
                             ),
                           ]),
@@ -166,7 +256,7 @@ class _AddTaskState extends State<AddTask> {
                   borderRadius: BorderRadius.circular(6),
                   color: ColorPalette.solidWhite),
               child: AddAtachments(
-                filename: filename,
+                filename: _filename,
                 load: _loadFile,
               ),
             ),
@@ -184,11 +274,9 @@ class _AddTaskState extends State<AddTask> {
                 onPressed: () {
                   bool added = _submit(context);
                   if (added) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text('Task added successfully')));
+                    showAlertDialog(context, 'Task added successfully!', 1);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text('Please enter avalid data')));
+                    showAlertDialog(context, 'Can`t add this Task!', 0);
                   }
                 },
                 child: Center(
